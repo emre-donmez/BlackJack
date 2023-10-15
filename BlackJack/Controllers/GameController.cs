@@ -11,24 +11,26 @@ namespace BlackJack.Controllers
 	{
 		private GameViewModel gameViewModel;
 
-        public GameController()
-        {
-           gameViewModel = new GameViewModel();
-        }
         public IActionResult StartGame()
         {
+            gameViewModel = new GameViewModel
+            {
+                Gamer = new Gamer { Hand = new List<Card>() },
+                Dealer = new Dealer { Hand = new List<Card>() },
+                Deck = GetNewDeck(),
+                GameStarted = true
+            };
 
-            gameViewModel.Gamer = new Gamer();
-            gameViewModel.Dealer = new Dealer();
-            gameViewModel.Deck = GetNewDeck();
-            gameViewModel.GameStarted = true;
+            SetGameViewModel(gameViewModel);
 
-            return View("Index", gameViewModel);
+            ViewBag.gameViewModel = gameViewModel;
+
+            return View("Index");
         }
 
         public IActionResult Index()
 		{
-			return View(gameViewModel);
+			return View();
 		}
 
 		public List<Card> GetNewDeck()
@@ -56,36 +58,104 @@ namespace BlackJack.Controllers
 			return cards.OrderBy(x=> random.Next()).ToList();
 		}
 
-        public void Hit(PlayerType target)
+        public IActionResult Hit(PlayerType target)
         {
-            Card drawnCard = gameViewModel.Deck[0];
+            var gameViewModelFromSession = GetGameViewModel();
+
+            Card drawnCard = gameViewModelFromSession.Deck[0];
 
             if (target == PlayerType.Gamer)
             {
-                gameViewModel.Gamer.Hand.Add(drawnCard);
+                gameViewModelFromSession.Gamer.Hand.Add(drawnCard);
             }
             else if (target == PlayerType.Dealer)
             {
-                gameViewModel.Dealer.Hand.Add(drawnCard);
+                gameViewModelFromSession.Dealer.Hand.Add(drawnCard);
             }
 
-            gameViewModel.Deck.RemoveAt(0);
+            gameViewModelFromSession.Deck.RemoveAt(0);
+
+            SetGameViewModel(gameViewModelFromSession);
+
+            ViewBag.gameViewModel = gameViewModelFromSession;
+
+            return View("Index");
+
         }
 
         public IActionResult DealCards()
-		{
+        {        
             for (int i = 0; i < 2; i++)
             {
 				Hit(PlayerType.Gamer);
 				Hit(PlayerType.Dealer);
             }
-            return View("Index", gameViewModel);
 
+            var gameViewModelFromSession = GetGameViewModel();
+            
+            ViewBag.gameViewModel = gameViewModelFromSession;
+
+            return View("Index");
         }
-
-        private IActionResult DetermineWinner()
+        private GameViewModel GetGameViewModel()
         {
-            return View();
+            var gameViewModelJson = HttpContext.Session.GetString("GameViewModel");
+            var gameViewModelFromSession = JsonConvert.DeserializeObject<GameViewModel>(gameViewModelJson);
+
+            return gameViewModelFromSession;
+        }
+        private void SetGameViewModel(GameViewModel gameViewModelFromSession)
+        {
+            var gameViewModelNewJson = JsonConvert.SerializeObject(gameViewModelFromSession);
+            HttpContext.Session.SetString("GameViewModel", gameViewModelNewJson);
+        }
+        public IActionResult DetermineWinner()
+        {
+            var gameViewModelFromSession = GetGameViewModel();
+
+            while (gameViewModelFromSession.Dealer.CalculateHandValue()<17)
+            {
+				Hit(PlayerType.Dealer);
+                gameViewModelFromSession = GetGameViewModel();
+            }
+
+            if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21)
+            {
+                ViewBag.message = "You won with blackjack";
+            }else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
+            {
+                ViewBag.message = "Dealer won with blackjack";
+            }
+            else if (gameViewModelFromSession.Gamer.CalculateHandValue() > 21)
+            {
+                ViewBag.message = "You busted";
+            }
+            else if (gameViewModelFromSession.Dealer.CalculateHandValue() > 21)
+            {
+                ViewBag.message = "Dealer busted";
+            }
+            else if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue())
+            {
+                ViewBag.message = "Draw";
+            }
+            else if (gameViewModelFromSession.Dealer.CalculateHandValue() > gameViewModelFromSession.Gamer.CalculateHandValue())
+            {
+                ViewBag.message = "Dealer won";
+            }
+            else if (gameViewModelFromSession.Dealer.CalculateHandValue() < gameViewModelFromSession.Gamer.CalculateHandValue())
+            {
+                ViewBag.message = "You won";
+            }
+
+
+            gameViewModelFromSession.Gamer.Hand.Clear();
+            gameViewModelFromSession.Dealer.Hand.Clear();
+
+            SetGameViewModel(gameViewModelFromSession);
+
+            ViewBag.gameViewModel = gameViewModelFromSession;
+
+            return View("Index");
         }
     }
 }

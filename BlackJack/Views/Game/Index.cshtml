@@ -1,6 +1,4 @@
-﻿@model GameViewModel
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Blackjack Game</title>
@@ -8,44 +6,63 @@
 <body>
     <h1>Welcome to Blackjack</h1>
 
-    @if (Model.GameStarted)
+  
+    @if (ViewBag.gameViewModel != null && ViewBag.gameViewModel.GameStarted)
     {
-        <!-- Oyun başladıktan sonra el ve diğer bilgileri görüntüleyin -->
-        <h2>Your Hand:</h2>
-        <ul>
-            @if (Model.Gamer.Hand != null)
-            {
-                @foreach (var card in Model.Gamer.Hand)
-                {
-                    <li>@card.Name of @card.Type</li>
-                }
-            }
-            
-        </ul>
-
+        
         <h2>Dealer's Hand:</h2>
         <ul>
-            @if (Model.Dealer.Hand != null)
+            @if (ViewBag.gameViewModel.Dealer.Hand.Count > 0)
             {
-                @foreach (var card in Model.Dealer.Hand.Skip(1))
+                @foreach (var card in ViewBag.gameViewModel.Dealer.Hand)
                 {
-                    <li>@card.Name of @card.Type</li>
+                    <li>@card</li>
                 }
+                <strong>@ViewBag.gameViewModel.Dealer.CalculateHandValue()</strong>
 
             }
         </ul>
 
+        <h2>Your Hand:</h2>
+        <ul>
+            @if (ViewBag.gameViewModel.Gamer.Hand.Count > 0)
+            {
+                @foreach (var card in ViewBag.gameViewModel.Gamer.Hand)
+                {
+                    <li>@card</li>
+                }
+                <strong>@ViewBag.gameViewModel.Gamer.CalculateHandValue()</strong>
+            }
 
-        <button type="submit" id="deal-cards-button">Deal Cards</button>
+        </ul>
+        <div>@ViewBag.message</div>
+        @if (ViewBag.gameViewModel.Gamer.Hand.Count < 2 && ViewBag.gameViewModel.Dealer.Hand.Count < 2)
+        {
+            <form asp-controller="Game" asp-action="DealCards">
+                <button type="submit" class="btn btn-primary">Deal Cards</button>
+            </form>
+        }else
+        {
+            <div class="d-flex justify-content-start">
+                <form asp-controller="Game" asp-action="Hit" method="post" style="margin-right: 10px;">
+                    <input type="hidden" name="target" value="Gamer" />
+                    <button type="submit" class="btn btn-primary">Hit</button>
+                </form>
+
+                <form asp-controller="Game" asp-action="DetermineWinner">
+                    <button type="submit" class="btn btn-primary">Stay</button>
+                </form>
+            </div>
 
 
-        <p>Deck Count: @Model.Deck.Count</p>
+        }
+
+        <p>Deck Count: @ViewBag.gameViewModel.Deck.Count</p>
     }
     else
     {
-        <!-- Oyun başlamadıysa, "Start" düğmesini göster -->
         <form asp-controller="Game" asp-action="StartGame">
-            <button type="submit">Start</button>
+            <button type="submit" class="btn btn-primary">Start</button>
         </form>
     }
   

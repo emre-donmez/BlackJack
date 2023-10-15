@@ -19,3 +19,7 @@
             });
         });
         });
+
+$('#deal-cards-button').click(function () {
+    location.reload();
+}); 

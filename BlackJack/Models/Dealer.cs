@@ -2,8 +2,8 @@
 {
 	public class Dealer
 	{
-		public List<Card>? Hand { get; set; }
-
+		public List<Card> Hand { get; set; }
+	
 		public int CalculateHandValue()
 		{
 			int handValue = 0;
