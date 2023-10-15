@@ -1,0 +1,54 @@
+﻿@model GameViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blackjack Game</title>
+</head>
+<body>
+    <h1>Welcome to Blackjack</h1>
+
+    @if (Model.GameStarted)
+    {
+        <!-- Oyun başladıktan sonra el ve diğer bilgileri görüntüleyin -->
+        <h2>Your Hand:</h2>
+        <ul>
+            @if (Model.Gamer.Hand != null)
+            {
+                @foreach (var card in Model.Gamer.Hand)
+                {
+                    <li>@card.Name of @card.Type</li>
+                }
+            }
+            
+        </ul>
+
+        <h2>Dealer's Hand:</h2>
+        <ul>
+            @if (Model.Dealer.Hand != null)
+            {
+                @foreach (var card in Model.Dealer.Hand.Skip(1))
+                {
+                    <li>@card.Name of @card.Type</li>
+                }
+
+            }
+        </ul>
+
+
+        <button type="submit" id="deal-cards-button">Deal Cards</button>
+
+
+        <p>Deck Count: @Model.Deck.Count</p>
+    }
+    else
+    {
+        <!-- Oyun başlamadıysa, "Start" düğmesini göster -->
+        <form asp-controller="Game" asp-action="StartGame">
+            <button type="submit">Start</button>
+        </form>
+    }
+  
+</body>
+
+</html>
