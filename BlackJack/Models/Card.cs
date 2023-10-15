@@ -14,6 +14,13 @@ namespace BlackJack.Models
 		public string Type { get; set; }
         public string Name { get; set; }
 
+		public string ImgLocation
+		{
+			get
+			{
+				return "/img/deck/" + Name + Type.First().ToString() + ".svg";
+			}
+		}
 		public int Value
 		{
 			get

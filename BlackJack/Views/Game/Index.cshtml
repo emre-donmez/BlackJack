@@ -6,34 +6,47 @@
 <body>
     <h1>Welcome to Blackjack</h1>
 
-  
     @if (ViewBag.gameViewModel != null && ViewBag.gameViewModel.GameStarted)
     {
-        
+
         <h2>Dealer's Hand:</h2>
-        <ul>
+        <ul style="list-style-type: none; display: flex; flex-direction: row;">
             @if (ViewBag.gameViewModel.Dealer.Hand.Count > 0 && ViewBag.gameViewModel.EndGame)
             {
                 @foreach (var card in ViewBag.gameViewModel.Dealer.Hand)
                 {
-                    <li>@card</li>
+                    <li style="display: flex; flex-direction: column; align-items: center; ">
+                        <img src="@card.ImgLocation" style="width:40%" />
+                        <span>@card</span>
+                    </li>
                 }
                 <strong>@ViewBag.gameViewModel.Dealer.CalculateHandValue()</strong>
-
             }
             else if (ViewBag.gameViewModel.Dealer.Hand.Count > 0)
             {
-               <li> @ViewBag.gameViewModel.Dealer.Hand[0];</li>
+                <li style="display: flex; flex-direction: column; align-items: center; ">
+                    <img src="@ViewBag.gameViewModel.Dealer.Hand[0].ImgLocation" style="width: 40%" />
+                    <span>@ViewBag.gameViewModel.Dealer.Hand[0]</span>
+                </li>
+                <li style="display: flex; flex-direction: column; align-items: center;">
+                    <img src="/img/deck/back.svg" style="width: 40%" />
+                </li>
             }
         </ul>
 
+
+
         <h2>Your Hand:</h2>
-        <ul>
+        <ul style="list-style-type: none; display: flex; flex-direction: row;">
+
             @if (ViewBag.gameViewModel.Gamer.Hand.Count > 0)
             {
                 @foreach (var card in ViewBag.gameViewModel.Gamer.Hand)
                 {
-                    <li>@card</li>
+                    <li style="display: flex; flex-direction: column; align-items: center; ">
+                        <img src="@card.ImgLocation" style="width:40%" />
+                        <span>@card</span>
+                    </li>
                 }
                 <strong>@ViewBag.gameViewModel.Gamer.CalculateHandValue()</strong>
             }

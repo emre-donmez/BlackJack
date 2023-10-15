@@ -36,13 +36,13 @@ namespace BlackJack.Controllers
 			List<Card> deck = new List<Card>();
 
 			String[] types = { "Hearts", "Diamonds", "Clubs", "Spades" };
-			String[] values = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+			String[] names = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
 
 			foreach (var type in types)
 			{
-				foreach (var value in values)
+				foreach (var name in names)
 				{
-					deck.Add(new Card(type, value));
+					deck.Add(new Card(type, name));
 				}
 			}
 
@@ -141,14 +141,14 @@ namespace BlackJack.Controllers
                 gameViewModelFromSession = GetGameViewModel();
             }
 
-            if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21)
+            if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue())
+                ViewBag.message = "Draw";
+            else if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21)
                 ViewBag.message = "You won with black jack";
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
                 ViewBag.message = "Dealer won with black jack";
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() > 21)
-                ViewBag.message = "Dealer busted";
-            else if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue())
-                ViewBag.message = "Draw";
+                ViewBag.message = "Dealer busted";            
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() > gameViewModelFromSession.Gamer.CalculateHandValue())
                 ViewBag.message = "Dealer won";
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() < gameViewModelFromSession.Gamer.CalculateHandValue())
