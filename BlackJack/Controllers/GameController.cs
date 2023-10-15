@@ -54,7 +54,6 @@ namespace BlackJack.Controllers
 		public List<Card> Shuffle(List<Card> cards)
 		{
 			Random random = new Random();
-
 			return cards.OrderBy(x=> random.Next()).ToList();
 		}
 
@@ -62,6 +61,10 @@ namespace BlackJack.Controllers
         {
             var gameViewModelFromSession = GetGameViewModel();
 
+            if (gameViewModelFromSession.Deck.Count == 0)
+            {
+                gameViewModelFromSession.Deck = GetNewDeck();
+            }
             Card drawnCard = gameViewModelFromSession.Deck[0];
 
             if (target == PlayerType.Gamer)
@@ -79,19 +82,48 @@ namespace BlackJack.Controllers
 
             ViewBag.gameViewModel = gameViewModelFromSession;
 
+            if (gameViewModelFromSession.Gamer.CalculateHandValue()>21)
+            {
+               return IsBusted();
+            }
+
+            return View("Index");
+
+        }
+
+        public IActionResult IsBusted()
+        {
+            var gameViewModelFromSession = GetGameViewModel();
+
+            ViewBag.message = "You busted";
+
+            gameViewModelFromSession.Gamer.Hand.Clear();
+            gameViewModelFromSession.Dealer.Hand.Clear();
+
+            SetGameViewModel(gameViewModelFromSession);
+
+            ViewBag.gameViewModel = gameViewModelFromSession;
+
             return View("Index");
 
         }
 
         public IActionResult DealCards()
-        {        
+        {
+            var gameViewModelFromSession = GetGameViewModel();
+
+            gameViewModelFromSession.Gamer.Hand.Clear();
+            gameViewModelFromSession.Dealer.Hand.Clear();
+
+            SetGameViewModel(gameViewModelFromSession);
+
             for (int i = 0; i < 2; i++)
             {
 				Hit(PlayerType.Gamer);
 				Hit(PlayerType.Dealer);
             }
 
-            var gameViewModelFromSession = GetGameViewModel();
+            gameViewModelFromSession = GetGameViewModel();
             
             ViewBag.gameViewModel = gameViewModelFromSession;
 
@@ -121,11 +153,11 @@ namespace BlackJack.Controllers
 
             if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21)
             {
-                ViewBag.message = "You won with blackjack";
+                ViewBag.message = "You won with black jack";
             }
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
             {
-                ViewBag.message = "Dealer won with blackjack";
+                ViewBag.message = "Dealer won with black jack";
             }
             else if (gameViewModelFromSession.Gamer.CalculateHandValue() > 21)
             {
@@ -149,9 +181,7 @@ namespace BlackJack.Controllers
             }
 
 
-            gameViewModelFromSession.Gamer.Hand.Clear();
-            gameViewModelFromSession.Dealer.Hand.Clear();
-
+         
             SetGameViewModel(gameViewModelFromSession);
 
             ViewBag.gameViewModel = gameViewModelFromSession;
