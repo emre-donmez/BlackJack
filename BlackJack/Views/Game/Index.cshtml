@@ -12,7 +12,7 @@
         
         <h2>Dealer's Hand:</h2>
         <ul>
-            @if (ViewBag.gameViewModel.Dealer.Hand.Count > 0)
+            @if (ViewBag.gameViewModel.Dealer.Hand.Count > 0 && ViewBag.gameViewModel.EndGame)
             {
                 @foreach (var card in ViewBag.gameViewModel.Dealer.Hand)
                 {
@@ -20,6 +20,10 @@
                 }
                 <strong>@ViewBag.gameViewModel.Dealer.CalculateHandValue()</strong>
 
+            }
+            else if (ViewBag.gameViewModel.Dealer.Hand.Count > 0)
+            {
+               <li> @ViewBag.gameViewModel.Dealer.Hand[0];</li>
             }
         </ul>
 
