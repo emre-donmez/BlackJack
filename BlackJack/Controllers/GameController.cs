@@ -122,7 +122,8 @@ namespace BlackJack.Controllers
             if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21)
             {
                 ViewBag.message = "You won with blackjack";
-            }else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
+            }
+            else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
             {
                 ViewBag.message = "Dealer won with blackjack";
             }
