@@ -1,24 +1,22 @@
 ﻿using BlackJack.Enums;
 using BlackJack.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
-using System.Numerics;
 
 namespace BlackJack.Controllers
 {
 	public class GameController : Controller
 	{
-		private GameViewModel gameViewModel;
 
         public IActionResult StartGame()
         {
-            gameViewModel = new GameViewModel
+            var gameViewModel = new GameViewModel
             {
                 Gamer = new Gamer { Hand = new List<Card>() },
                 Dealer = new Dealer { Hand = new List<Card>() },
                 Deck = GetNewDeck(),
-                GameStarted = true
+                GameStarted = true,
+                EndGame = true
             };
 
             SetGameViewModel(gameViewModel);
@@ -62,19 +60,14 @@ namespace BlackJack.Controllers
             var gameViewModelFromSession = GetGameViewModel();
 
             if (gameViewModelFromSession.Deck.Count == 0)
-            {
                 gameViewModelFromSession.Deck = GetNewDeck();
-            }
+
             Card drawnCard = gameViewModelFromSession.Deck[0];
 
             if (target == PlayerType.Gamer)
-            {
                 gameViewModelFromSession.Gamer.Hand.Add(drawnCard);
-            }
             else if (target == PlayerType.Dealer)
-            {
                 gameViewModelFromSession.Dealer.Hand.Add(drawnCard);
-            }
 
             gameViewModelFromSession.Deck.RemoveAt(0);
 
@@ -83,14 +76,11 @@ namespace BlackJack.Controllers
             ViewBag.gameViewModel = gameViewModelFromSession;
 
             if (gameViewModelFromSession.Gamer.CalculateHandValue()>21)
-            {
                return IsBusted();
-            }
 
             return View("Index");
-
         }
-
+        //burada bir sorun var çöz
         public IActionResult IsBusted()
         {
             var gameViewModelFromSession = GetGameViewModel();
@@ -100,12 +90,13 @@ namespace BlackJack.Controllers
             gameViewModelFromSession.Gamer.Hand.Clear();
             gameViewModelFromSession.Dealer.Hand.Clear();
 
+            gameViewModelFromSession.EndGame = false;
+
             SetGameViewModel(gameViewModelFromSession);
 
             ViewBag.gameViewModel = gameViewModelFromSession;
 
             return View("Index");
-
         }
 
         public IActionResult DealCards()
@@ -114,6 +105,8 @@ namespace BlackJack.Controllers
 
             gameViewModelFromSession.Gamer.Hand.Clear();
             gameViewModelFromSession.Dealer.Hand.Clear();
+
+            gameViewModelFromSession.EndGame = false;
 
             SetGameViewModel(gameViewModelFromSession);
 
@@ -152,36 +145,22 @@ namespace BlackJack.Controllers
             }
 
             if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21)
-            {
                 ViewBag.message = "You won with black jack";
-            }
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
-            {
                 ViewBag.message = "Dealer won with black jack";
-            }
             else if (gameViewModelFromSession.Gamer.CalculateHandValue() > 21)
-            {
                 ViewBag.message = "You busted";
-            }
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() > 21)
-            {
                 ViewBag.message = "Dealer busted";
-            }
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue())
-            {
                 ViewBag.message = "Draw";
-            }
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() > gameViewModelFromSession.Gamer.CalculateHandValue())
-            {
                 ViewBag.message = "Dealer won";
-            }
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() < gameViewModelFromSession.Gamer.CalculateHandValue())
-            {
                 ViewBag.message = "You won";
-            }
 
-
-         
+            gameViewModelFromSession.EndGame = true;
+            
             SetGameViewModel(gameViewModelFromSession);
 
             ViewBag.gameViewModel = gameViewModelFromSession;

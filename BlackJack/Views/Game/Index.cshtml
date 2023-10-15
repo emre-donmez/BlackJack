@@ -35,13 +35,15 @@
             }
 
         </ul>
+
         <div>@ViewBag.message</div>
-        @if (ViewBag.gameViewModel.Gamer.Hand.Count < 2 && ViewBag.gameViewModel.Dealer.Hand.Count < 2)
+        @if (ViewBag.gameViewModel.EndGame)
         {
             <form asp-controller="Game" asp-action="DealCards">
                 <button type="submit" class="btn btn-primary">Deal Cards</button>
             </form>
-        }else
+        }
+        else
         {
             <div class="d-flex justify-content-start">
                 <form asp-controller="Game" asp-action="Hit" method="post" style="margin-right: 10px;">
@@ -53,8 +55,6 @@
                     <button type="submit" class="btn btn-primary">Stay</button>
                 </form>
             </div>
-
-
         }
 
         <p>Deck Count: @ViewBag.gameViewModel.Deck.Count</p>
