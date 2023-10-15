@@ -80,17 +80,14 @@ namespace BlackJack.Controllers
 
             return View("Index");
         }
-        //burada bir sorun var çöz
+     
         public IActionResult IsBusted()
         {
             var gameViewModelFromSession = GetGameViewModel();
 
             ViewBag.message = "You busted";
 
-            gameViewModelFromSession.Gamer.Hand.Clear();
-            gameViewModelFromSession.Dealer.Hand.Clear();
-
-            gameViewModelFromSession.EndGame = false;
+            gameViewModelFromSession.EndGame = true;
 
             SetGameViewModel(gameViewModelFromSession);
 
@@ -148,8 +145,6 @@ namespace BlackJack.Controllers
                 ViewBag.message = "You won with black jack";
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
                 ViewBag.message = "Dealer won with black jack";
-            else if (gameViewModelFromSession.Gamer.CalculateHandValue() > 21)
-                ViewBag.message = "You busted";
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() > 21)
                 ViewBag.message = "Dealer busted";
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue())
