@@ -5,10 +5,10 @@
 </head>
 <body>
     <h1>Welcome to Blackjack</h1>
-
+    <div class="d-flex justify-content-center">
     @if (ViewBag.gameViewModel != null && ViewBag.gameViewModel.GameStarted)
     {
-
+       
         <h2>Dealer's Hand:</h2>
         <ul style="list-style-type: none; display: flex; flex-direction: row;">
             @if (ViewBag.gameViewModel.Dealer.Hand.Count > 0 && ViewBag.gameViewModel.EndGame)
@@ -56,10 +56,10 @@
         <div>@ViewBag.message</div>
         @if (ViewBag.gameViewModel.EndGame)
         {
-            <form asp-controller="Game" asp-action="DealCards">
+            <form asp-controller="Game" asp-action="Bet">
                 <button type="submit" class="btn btn-primary">Deal Cards</button>
                 <label>Bet</label>
-                <input type="number" required name="bet" value="@ViewBag.gameViewModel.Bet" max="@ViewBag.gameViewModel.Gamer.Balance" />
+                <input type="number" required name="bet" value="@ViewBag.gameViewModel.Bet" max="@ViewBag.gameViewModel.Gamer.Balance" min="1" />
             </form>
         }
         else
@@ -70,13 +70,19 @@
                     <button type="submit" class="btn btn-primary">Hit</button>
                 </form>
 
-                <form asp-controller="Game" asp-action="DetermineWinner">
+                <form asp-controller="Game" asp-action="DetermineWinner" style="margin-right: 10px;">
                     <button type="submit" class="btn btn-primary">Stay</button>
                 </form>
+
+                <form asp-controller="Game" asp-action="Double">
+                    <button type="submit" class="btn btn-primary">Double</button>
+                </form>
             </div>
+            <p>Bet: @ViewBag.gameViewModel.Bet</p>
+
         }
 
-        <p>Deck Count: @ViewBag.gameViewModel.Deck.Count</p>
+        @*<p>Deck Count: @ViewBag.gameViewModel.Deck.Count</p>*@
         <p>Balance: @ViewBag.gameViewModel.Gamer.Balance</p>
     }
     else
@@ -84,10 +90,10 @@
         <form asp-controller="Game" asp-action="StartGame">
             <button type="submit" class="btn btn-primary">Start</button>
             <label>Balance</label>
-            <input type="number" required name="balance" />
+            <input type="number" required name="balance" min="1" />
         </form>
     }
-  
+    </div>
 </body>
 
 </html>

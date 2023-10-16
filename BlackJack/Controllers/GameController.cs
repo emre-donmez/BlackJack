@@ -7,6 +7,18 @@ namespace BlackJack.Controllers
 {
 	public class GameController : Controller
 	{
+        private GameViewModel GetGameViewModel()
+        {
+            var gameViewModelJson = HttpContext.Session.GetString("GameViewModel");         
+            return JsonConvert.DeserializeObject<GameViewModel>(gameViewModelJson);
+        }
+        private void SetGameViewModel(GameViewModel gameViewModelFromSession)
+        {
+            var gameViewModelNewJson = JsonConvert.SerializeObject(gameViewModelFromSession);
+            HttpContext.Session.SetString("GameViewModel", gameViewModelNewJson);
+        }
+
+        [HttpPost]
         public IActionResult StartGame(int balance)
         {
             var gameViewModel = new GameViewModel
@@ -95,23 +107,12 @@ namespace BlackJack.Controllers
             return View("Index");
         }
 
-        public IActionResult DealCards(int bet)
+        public IActionResult DealCards()
         {
             var gameViewModelFromSession = GetGameViewModel();
 
-            if (bet > gameViewModelFromSession.Gamer.Balance)
-            {
-                ViewBag.gameViewModel = gameViewModelFromSession;
-                ViewBag.message = "You have not enough money";
-                return View("Index");
-            }
-
             gameViewModelFromSession.Gamer.Hand.Clear();
-            gameViewModelFromSession.Dealer.Hand.Clear();            
-                
-            gameViewModelFromSession.Bet = bet;
-            gameViewModelFromSession.Gamer.Balance -= bet;
-
+            gameViewModelFromSession.Dealer.Hand.Clear();
             gameViewModelFromSession.EndGame = false;
 
             SetGameViewModel(gameViewModelFromSession);
@@ -128,18 +129,45 @@ namespace BlackJack.Controllers
 
             return View("Index");
         }
-        private GameViewModel GetGameViewModel()
-        {
-            var gameViewModelJson = HttpContext.Session.GetString("GameViewModel");
-            var gameViewModelFromSession = JsonConvert.DeserializeObject<GameViewModel>(gameViewModelJson);
 
-            return gameViewModelFromSession;
-        }
-        private void SetGameViewModel(GameViewModel gameViewModelFromSession)
+        public IActionResult Bet(int bet)
         {
-            var gameViewModelNewJson = JsonConvert.SerializeObject(gameViewModelFromSession);
-            HttpContext.Session.SetString("GameViewModel", gameViewModelNewJson);
+            var gameViewModelFromSession = GetGameViewModel();
+
+            if (bet > gameViewModelFromSession.Gamer.Balance)
+            {
+                ViewBag.gameViewModel = gameViewModelFromSession;
+                ViewBag.message = "You have not enough money";
+                return View("Index");
+            }
+            else if(bet < 0)
+            {
+                ViewBag.gameViewModel = gameViewModelFromSession;
+                ViewBag.message = "Bet cannot negative numbers";
+                return View("Index");
+            }
+            gameViewModelFromSession.Bet = bet;
+            gameViewModelFromSession.Gamer.Balance -= bet;
+
+            SetGameViewModel(gameViewModelFromSession);
+
+            return DealCards();
         }
+        public IActionResult Double()
+        {
+            var gameViewModelFromSession = GetGameViewModel();
+            if (gameViewModelFromSession.Bet > gameViewModelFromSession.Gamer.Balance)
+            {
+                ViewBag.gameViewModel = gameViewModelFromSession;
+                ViewBag.message = "You have not enough money";
+                return View("Index");
+            }
+            gameViewModelFromSession.Gamer.Balance -= gameViewModelFromSession.Bet;
+            SetGameViewModel(gameViewModelFromSession);
+            Hit(PlayerType.Gamer);
+            return DetermineWinner();
+        }
+        
         public IActionResult DetermineWinner()
         {
             var gameViewModelFromSession = GetGameViewModel();
@@ -150,28 +178,27 @@ namespace BlackJack.Controllers
                 gameViewModelFromSession = GetGameViewModel();
             }
 
-            if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue()) 
+            var dealerHandValue = gameViewModelFromSession.Dealer.CalculateHandValue();
+            var gamerHandValue = gameViewModelFromSession.Gamer.CalculateHandValue();
+
+            if (dealerHandValue == gamerHandValue && dealerHandValue<=21) 
             {
                 gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet;
                 ViewBag.message = "Draw";
             }                
-            else if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21) 
+            else if (gamerHandValue ==21 && gameViewModelFromSession.Gamer.Hand.Count ==2) 
             {
                 gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet * 5/2;
                 ViewBag.message = "You won with black jack";
             }              
-            else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21) 
-                ViewBag.message = "Dealer won with black jack";
-            else if (gameViewModelFromSession.Dealer.CalculateHandValue() > 21)
-                ViewBag.message = "Dealer busted";            
-            else if (gameViewModelFromSession.Dealer.CalculateHandValue() > gameViewModelFromSession.Gamer.CalculateHandValue())
-                ViewBag.message = "Dealer won";
-            else if (gameViewModelFromSession.Dealer.CalculateHandValue() < gameViewModelFromSession.Gamer.CalculateHandValue()) 
+            else if (dealerHandValue > 21 || gamerHandValue > dealerHandValue)
             {
-                gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet *2;
                 ViewBag.message = "You won";
+                gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet * 2;
             }
-
+            else
+                ViewBag.message = "You lose";
+           
             gameViewModelFromSession.EndGame = true;
             
             SetGameViewModel(gameViewModelFromSession);
