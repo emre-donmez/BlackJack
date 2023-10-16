@@ -14,9 +14,7 @@
 				handValue += card.Value;
 
 				if (card.Name == "A")
-				{
 					aceCount++;
-				}
 			}
 
 			if (handValue > 21)

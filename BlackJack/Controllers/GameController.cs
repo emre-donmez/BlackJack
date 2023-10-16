@@ -143,7 +143,7 @@ namespace BlackJack.Controllers
             else if(bet < 0)
             {
                 ViewBag.gameViewModel = gameViewModelFromSession;
-                ViewBag.message = "Bet cannot negative numbers";
+                ViewBag.message = "Bet cannot negative";
                 return View("Index");
             }
             gameViewModelFromSession.Bet = bet;
@@ -172,7 +172,7 @@ namespace BlackJack.Controllers
         {
             var gameViewModelFromSession = GetGameViewModel();
 
-            while (gameViewModelFromSession.Dealer.CalculateHandValue()<17)
+            while (gameViewModelFromSession.Dealer.CalculateHandValue() < 17)
             {
 				Hit(PlayerType.Dealer);
                 gameViewModelFromSession = GetGameViewModel();
@@ -181,12 +181,12 @@ namespace BlackJack.Controllers
             var dealerHandValue = gameViewModelFromSession.Dealer.CalculateHandValue();
             var gamerHandValue = gameViewModelFromSession.Gamer.CalculateHandValue();
 
-            if (dealerHandValue == gamerHandValue && dealerHandValue<=21) 
+            if (dealerHandValue == gamerHandValue && dealerHandValue <= 21) 
             {
                 gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet;
                 ViewBag.message = "Draw";
             }                
-            else if (gamerHandValue ==21 && gameViewModelFromSession.Gamer.Hand.Count ==2) 
+            else if (gamerHandValue == 21 && gameViewModelFromSession.Gamer.Hand.Count == 2) 
             {
                 gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet * 5/2;
                 ViewBag.message = "You won with black jack";

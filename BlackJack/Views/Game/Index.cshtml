@@ -2,98 +2,99 @@
 <html>
 <head>
     <title>Blackjack Game</title>
+    <link rel="stylesheet" href="/css/game.css">
 </head>
 <body>
-    <h1>Welcome to Blackjack</h1>
-    <div class="d-flex justify-content-center">
-    @if (ViewBag.gameViewModel != null && ViewBag.gameViewModel.GameStarted)
-    {
-       
-        <h2>Dealer's Hand:</h2>
-        <ul style="list-style-type: none; display: flex; flex-direction: row;">
-            @if (ViewBag.gameViewModel.Dealer.Hand.Count > 0 && ViewBag.gameViewModel.EndGame)
-            {
-                @foreach (var card in ViewBag.gameViewModel.Dealer.Hand)
-                {
-                    <li style="display: flex; flex-direction: column; align-items: center; ">
-                        <img src="@card.ImgLocation" style="width:40%" />
-                        <span>@card</span>
-                    </li>
-                }
-                <strong>@ViewBag.gameViewModel.Dealer.CalculateHandValue()</strong>
-            }
-            else if (ViewBag.gameViewModel.Dealer.Hand.Count > 0)
-            {
-                <li style="display: flex; flex-direction: column; align-items: center; ">
-                    <img src="@ViewBag.gameViewModel.Dealer.Hand[0].ImgLocation" style="width: 40%" />
-                    <span>@ViewBag.gameViewModel.Dealer.Hand[0]</span>
-                </li>
-                <li style="display: flex; flex-direction: column; align-items: center;">
-                    <img src="/img/deck/back.svg" style="width: 40%" />
-                </li>
-            }
-        </ul>
-
-
-
-        <h2>Your Hand:</h2>
-        <ul style="list-style-type: none; display: flex; flex-direction: row;">
-
-            @if (ViewBag.gameViewModel.Gamer.Hand.Count > 0)
-            {
-                @foreach (var card in ViewBag.gameViewModel.Gamer.Hand)
-                {
-                    <li style="display: flex; flex-direction: column; align-items: center; ">
-                        <img src="@card.ImgLocation" style="width:40%" />
-                        <span>@card</span>
-                    </li>
-                }
-                <strong>@ViewBag.gameViewModel.Gamer.CalculateHandValue()</strong>
-            }
-
-        </ul>
-
-        <div>@ViewBag.message</div>
-        @if (ViewBag.gameViewModel.EndGame)
+    <div class="container">
+        @if (ViewBag.gameViewModel != null && ViewBag.gameViewModel.GameStarted)
         {
-            <form asp-controller="Game" asp-action="Bet">
-                <button type="submit" class="btn btn-primary">Deal Cards</button>
-                <label>Bet</label>
-                <input type="number" required name="bet" value="@ViewBag.gameViewModel.Bet" max="@ViewBag.gameViewModel.Gamer.Balance" min="1" />
-            </form>
-        }
-        else
-        {
-            <div class="d-flex justify-content-start">
-                <form asp-controller="Game" asp-action="Hit" method="post" style="margin-right: 10px;">
-                    <input type="hidden" name="target" value="Gamer" />
-                    <button type="submit" class="btn btn-primary">Hit</button>
-                </form>
+            <div class="dealer-and-player">
+                <div class="dealer-section">
+                    <div class="card-stack">
+                        @if (ViewBag.gameViewModel.Dealer.Hand.Count > 0 && ViewBag.gameViewModel.EndGame)
+                        {
+                            <h2>Dealer's Hand:</h2>
 
-                <form asp-controller="Game" asp-action="DetermineWinner" style="margin-right: 10px;">
-                    <button type="submit" class="btn btn-primary">Stay</button>
-                </form>
+                            @foreach (var card in ViewBag.gameViewModel.Dealer.Hand)
+                            {
+                                <div class="card">
+                                    <img src="@card.ImgLocation" alt="@card" />
+                                </div>
+                            }
+                            <strong>@ViewBag.gameViewModel.Dealer.CalculateHandValue()</strong>
+                        }
+                        else if (ViewBag.gameViewModel.Dealer.Hand.Count > 0)
+                        {
+                            <h2>Dealer's Hand:</h2>
 
-                <form asp-controller="Game" asp-action="Double">
-                    <button type="submit" class="btn btn-primary">Double</button>
-                </form>
+                            <div class="card">
+                                <img src="@ViewBag.gameViewModel.Dealer.Hand[0].ImgLocation" alt="@ViewBag.gameViewModel.Dealer.Hand[0]" />
+                            </div>
+                            <div class="card">
+                                <img src="/img/deck/back.svg" alt="Card Back" />
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="player-section">
+                    <div class="card-stack">
+                        @if (ViewBag.gameViewModel.Gamer.Hand.Count > 0)
+                        {
+                            <h2>Your Hand:</h2>
+
+                            @foreach (var card in ViewBag.gameViewModel.Gamer.Hand)
+                            {
+                                <div class="card">
+                                    <img src="@card.ImgLocation" alt="@card" />
+                                </div>
+                            }
+                            <strong>@ViewBag.gameViewModel.Gamer.CalculateHandValue()</strong>
+                        }
+                    </div>
+                </div>
             </div>
-            <p>Bet: @ViewBag.gameViewModel.Bet</p>
 
-        }
+            <div class="message">@ViewBag.message</div>
 
-        @*<p>Deck Count: @ViewBag.gameViewModel.Deck.Count</p>*@
-        <p>Balance: @ViewBag.gameViewModel.Gamer.Balance</p>
+            @if (ViewBag.gameViewModel.EndGame)
+            {
+                <form asp-controller="Game" asp-action="Bet" class="bet-form">                   
+                    <label for="bet">Bet</label>
+                    <input type="number" required name="bet" value="@ViewBag.gameViewModel.Bet" max="@ViewBag.gameViewModel.Gamer.Balance" min="1" />
+                    <button type="submit" class="btn btn-primary btn-full-width">Deal Cards</button>
+                </form>
+            }
+            else
+            {
+                <div class="actions">
+                    <form asp-controller="Game" asp-action="Hit" method="post">
+                        <input type="hidden" name="target" value="Gamer" />
+                        <button type="submit" class="btn btn-primary">Hit</button>
+                    </form>
+
+                    <form asp-controller="Game" asp-action="DetermineWinner">
+                        <button type="submit" class="btn btn-primary mx-2">Stay</button>
+                    </form>
+
+                    <form asp-controller="Game" asp-action="Double">
+                        <button type="submit" class="btn btn-primary">Double</button>
+                    </form>
+                </div>
+                <div>Bet: @ViewBag.gameViewModel.Bet</div>
+            }
+            <div>Balance: @ViewBag.gameViewModel.Gamer.Balance</div>
+        
     }
     else
     {
-        <form asp-controller="Game" asp-action="StartGame">
-            <button type="submit" class="btn btn-primary">Start</button>
-            <label>Balance</label>
+        <h1>Welcome to Blackjack</h1>
+        <form asp-controller="Game" asp-action="StartGame" class="start-form">
+            <label for="balance">Balance</label>
             <input type="number" required name="balance" min="1" />
+            <button type="submit" class="btn btn-primary btn-full-width">Start</button>
         </form>
     }
-    </div>
+</div>
 </body>
-
 </html>
