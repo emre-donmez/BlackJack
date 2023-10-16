@@ -7,5 +7,6 @@
         public List<Card> Deck { get; set; }
         public bool GameStarted { get; set; } = false;
         public bool EndGame { get; set; }
+        public int Bet { get; set; }
     }
 }

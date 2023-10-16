@@ -58,6 +58,8 @@
         {
             <form asp-controller="Game" asp-action="DealCards">
                 <button type="submit" class="btn btn-primary">Deal Cards</button>
+                <label>Bet</label>
+                <input type="number" required name="bet" value="@ViewBag.gameViewModel.Bet" max="@ViewBag.gameViewModel.Gamer.Balance" />
             </form>
         }
         else
@@ -75,11 +77,14 @@
         }
 
         <p>Deck Count: @ViewBag.gameViewModel.Deck.Count</p>
+        <p>Balance: @ViewBag.gameViewModel.Gamer.Balance</p>
     }
     else
     {
         <form asp-controller="Game" asp-action="StartGame">
             <button type="submit" class="btn btn-primary">Start</button>
+            <label>Balance</label>
+            <input type="number" required name="balance" />
         </form>
     }
   

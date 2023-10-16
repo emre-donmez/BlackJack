@@ -7,12 +7,11 @@ namespace BlackJack.Controllers
 {
 	public class GameController : Controller
 	{
-
-        public IActionResult StartGame()
+        public IActionResult StartGame(int balance)
         {
             var gameViewModel = new GameViewModel
             {
-                Gamer = new Gamer { Hand = new List<Card>() },
+                Gamer = new Gamer { Hand = new List<Card>() , Balance = balance},
                 Dealer = new Dealer { Hand = new List<Card>() },
                 Deck = GetNewDeck(),
                 GameStarted = true,
@@ -96,12 +95,22 @@ namespace BlackJack.Controllers
             return View("Index");
         }
 
-        public IActionResult DealCards()
+        public IActionResult DealCards(int bet)
         {
             var gameViewModelFromSession = GetGameViewModel();
 
+            if (bet > gameViewModelFromSession.Gamer.Balance)
+            {
+                ViewBag.gameViewModel = gameViewModelFromSession;
+                ViewBag.message = "You have not enough money";
+                return View("Index");
+            }
+
             gameViewModelFromSession.Gamer.Hand.Clear();
-            gameViewModelFromSession.Dealer.Hand.Clear();
+            gameViewModelFromSession.Dealer.Hand.Clear();            
+                
+            gameViewModelFromSession.Bet = bet;
+            gameViewModelFromSession.Gamer.Balance -= bet;
 
             gameViewModelFromSession.EndGame = false;
 
@@ -141,18 +150,27 @@ namespace BlackJack.Controllers
                 gameViewModelFromSession = GetGameViewModel();
             }
 
-            if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue())
+            if (gameViewModelFromSession.Dealer.CalculateHandValue() == gameViewModelFromSession.Gamer.CalculateHandValue()) 
+            {
+                gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet;
                 ViewBag.message = "Draw";
-            else if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21)
+            }                
+            else if (gameViewModelFromSession.Gamer.CalculateHandValue() == 21) 
+            {
+                gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet * 5/2;
                 ViewBag.message = "You won with black jack";
-            else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21)
+            }              
+            else if (gameViewModelFromSession.Dealer.CalculateHandValue() == 21) 
                 ViewBag.message = "Dealer won with black jack";
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() > 21)
                 ViewBag.message = "Dealer busted";            
             else if (gameViewModelFromSession.Dealer.CalculateHandValue() > gameViewModelFromSession.Gamer.CalculateHandValue())
                 ViewBag.message = "Dealer won";
-            else if (gameViewModelFromSession.Dealer.CalculateHandValue() < gameViewModelFromSession.Gamer.CalculateHandValue())
+            else if (gameViewModelFromSession.Dealer.CalculateHandValue() < gameViewModelFromSession.Gamer.CalculateHandValue()) 
+            {
+                gameViewModelFromSession.Gamer.Balance += gameViewModelFromSession.Bet *2;
                 ViewBag.message = "You won";
+            }
 
             gameViewModelFromSession.EndGame = true;
             
