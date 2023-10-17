@@ -62,7 +62,7 @@
                 <form asp-controller="Game" asp-action="Bet" class="bet-form">                   
                     <label for="bet">Bet</label>
                     <input type="number" required name="bet" value="@ViewBag.gameViewModel.Bet" max="@ViewBag.gameViewModel.Gamer.Balance" min="1" />
-                    <button type="submit" class="btn btn-primary btn-full-width">Deal Cards</button>
+                    <button type="submit" class="btn btn-primary btn-full-width mb-1">Deal Cards</button>
                 </form>
             }
             else
@@ -84,8 +84,9 @@
                 <div>Bet: @ViewBag.gameViewModel.Bet</div>
             }
             <div>Balance: @ViewBag.gameViewModel.Gamer.Balance</div>
-        
-    }
+            <button id="exit" class="btn btn-primary btn-full-width">Exit</button>
+
+        }
     else
     {
         <h1>Welcome to Blackjack</h1>
@@ -96,5 +97,10 @@
         </form>
     }
 </div>
+    <script>
+        document.getElementById("exit").addEventListener("click", function () {
+            window.location.href = "@Url.Action("Index", "Game")";
+        });
+    </script>
 </body>
 </html>
