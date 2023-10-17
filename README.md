@@ -29,6 +29,15 @@ Once you have set your balance, you can choose your bet amount, and then click t
 4. Your balance will be updated at the end of each hand, depending on whether you win or lose.
 5. To end the game, click the "Quit" button.
 
+## Screenshots
+
+![Main Page](/screenshots/main_page.png)
+*Main Page - Enter your balance and start the game.*
+![Bet](/screenshots/bet.png)
+*Bet - Choose the desired bet amount on this page.*
+![Gameplay](/screenshots/gameplay.png)
+*Gameplay - Deal cards, make decisions, and see your balance.*
+
 ## Development of the Game
 
 The game has been developed using ASP.NET MVC, and player information and game state are stored using sessions. The rules and game mechanics are implemented in the GameController and model classes.
