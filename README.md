@@ -27,7 +27,7 @@ Once you have set your balance, you can choose your bet amount, and then click t
 2. When you start the game, you will begin with your initial balance.
 3. In each hand, click the appropriate buttons to take cards or pass.
 4. Your balance will be updated at the end of each hand, depending on whether you win or lose.
-5. To end the game, click the "Quit" button.
+5. To end the game, click the "Exit" button.
 
 ## Screenshots
 
